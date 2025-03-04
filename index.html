@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思维导图工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入D3.js库 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- html2canvas库用于导出图片 -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>思维导图</h1>
+            </div>
+            <div class="toolbar">
+                <button id="add-node" title="添加节点"><i class="fas fa-plus"></i> 添加节点</button>
+                <button id="delete-node" title="删除节点"><i class="fas fa-trash"></i> 删除节点</button>
+                <div class="color-picker">
+                    <label for="node-color">节点颜色:</label>
+                    <input type="color" id="node-color" value="#4CAF50">
+                </div>
+                <button id="export-png" title="导出为PNG"><i class="fas fa-download"></i> 导出PNG</button>
+                <button id="save-map" title="保存思维导图"><i class="fas fa-save"></i> 保存</button>
+                <button id="load-map" title="加载思维导图"><i class="fas fa-folder-open"></i> 加载</button>
+                <button id="clear-map" title="清空画布"><i class="fas fa-broom"></i> 清空画布</button>
+            </div>
+            <div class="help-section">
+                <h3>使用帮助</h3>
+                <ul>
+                    <li><i class="fas fa-mouse-pointer"></i> 点击节点选择</li>
+                    <li><i class="fas fa-arrows-alt"></i> 拖动节点移动位置</li>
+                    <li><i class="fas fa-plus"></i> 添加子节点</li>
+                    <li><i class="fas fa-edit"></i> 双击节点编辑文本</li>
+                    <li><i class="fas fa-right-click"></i> 右键点击添加节点</li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-content">
+            <div id="mindmap-container">
+                <!-- 思维导图将在这里渲染 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 节点编辑弹窗 -->
+    <div id="node-editor" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>编辑节点</h2>
+            <div class="form-group">
+                <label for="node-text">节点文本:</label>
+                <textarea id="node-text" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="edit-node-color">节点颜色:</label>
+                <input type="color" id="edit-node-color" value="#4CAF50">
+            </div>
+            <button id="save-node" class="btn primary">保存</button>
+        </div>
+    </div>
+    
+    <!-- 文件保存/加载弹窗 -->
+    <div id="file-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="file-modal-title">保存思维导图</h2>
+            <div class="form-group">
+                <label for="file-name">文件名:</label>
+                <input type="text" id="file-name" value="我的思维导图">
+            </div>
+            <div id="load-file-section" style="display: none;">
+                <div class="form-group">
+                    <label for="load-file">选择文件:</label>
+                    <input type="file" id="load-file" accept=".json">
+                </div>
+            </div>
+            <button id="confirm-file-action" class="btn primary">确认</button>
+        </div>
+    </div>
+    
+    <!-- 右键菜单 -->
+    <div id="context-menu" class="context-menu">
+        <div class="menu-item" id="add-node-here">
+            <i class="fas fa-plus"></i> 在此添加节点
+        </div>
+        <div class="menu-item" id="edit-node-context">
+            <i class="fas fa-edit"></i> 编辑节点
+        </div>
+        <div class="menu-item" id="delete-node-context">
+            <i class="fas fa-trash"></i> 删除节点
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
