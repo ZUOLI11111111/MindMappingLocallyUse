@@ -252,7 +252,52 @@ function drawNodes(nodes) {
     nodeGroups.on('dblclick', function(event, d) {
         event.stopPropagation();
         selectNode(d);
-        openNodeEditor();
+        
+        // 创建一个临时文本输入框用于直接编辑
+        const node = d3.select(this);
+        const nodeRect = node.select('rect').node().getBBox();
+        const nodeText = node.select('text');
+        const currentText = d.text;
+        
+        // 隐藏文本
+        nodeText.style('display', 'none');
+        
+        // 创建文本输入框
+        const foreignObject = node.append('foreignObject')
+            .attr('width', Math.max(150, nodeRect.width))
+            .attr('height', 40)
+            .attr('x', -Math.max(150, nodeRect.width) / 2)
+            .attr('y', -20);
+            
+        const textInput = foreignObject.append('xhtml:input')
+            .attr('type', 'text')
+            .attr('value', currentText)
+            .style('width', '100%')
+            .style('height', '100%')
+            .style('font-size', '14px')
+            .style('border', '1px solid #ccc')
+            .style('padding', '5px')
+            .style('box-sizing', 'border-box')
+            .style('background-color', d.color || '#3498db')
+            .style('color', '#fff')
+            .style('text-align', 'center');
+        
+        // 自动聚焦到输入框
+        textInput.node().focus();
+        textInput.node().select();
+        
+        // 处理输入框失去焦点或按下Enter键时保存编辑
+        textInput.on('blur', function() {
+            saveInlineEdit(node, nodeText, foreignObject, d, this.value);
+        }).on('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveInlineEdit(node, nodeText, foreignObject, d, this.value);
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                cancelInlineEdit(node, nodeText, foreignObject);
+            }
+        });
     });
     
     nodeGroups.on('contextmenu', function(event, d) {
@@ -810,4 +855,34 @@ function init() {
 }
 
 // 当页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', init); 
+document.addEventListener('DOMContentLoaded', init);
+
+// 保存内联编辑
+function saveInlineEdit(node, nodeText, foreignObject, nodeData, newText) {
+    // 删除输入框
+    foreignObject.remove();
+    
+    // 更新节点数据和显示
+    nodeData.text = newText;
+    
+    // 更新文本
+    nodeText.text(newText).style('display', null);
+    
+    // 更新矩形宽度和位置
+    const rectWidth = Math.max(100, newText.length * 10);
+    node.select('.node-rect')
+        .attr('width', rectWidth)
+        .attr('x', -rectWidth / 2);
+    
+    // 更新连接线
+    updateConnectionsImmediate();
+}
+
+// 取消内联编辑
+function cancelInlineEdit(node, nodeText, foreignObject) {
+    // 删除输入框
+    foreignObject.remove();
+    
+    // 恢复显示原始文本
+    nodeText.style('display', null);
+} 
